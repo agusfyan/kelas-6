@@ -1,269 +1,1379 @@
 <!doctype html>
 <html lang="id">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>UPTD SD Negeri 2 Tanjung Qencono</title>
-<link rel="icon" href="https://iili.io/FSNupqu.png" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root {
-  --bg:#f5f7fb; --card:#fff; --muted:#0055ff;
-  --accent:#0b5ed7; --accent-2:#2b6ea3;
-  --gray:#d5fe04; --shadow: 0 6px 16px rgba(0,0,0,0.2);
-  --gold:#04ff71; --dongker:#1e3a8a;
-}
-[data-theme="dark"] {
-  --bg:#0b1220; --card:#848484; --muted:#006aff;
-  --accent:#d5fe04; --accent-2:#d5fe04; --gray:#d5fe04;
-}
-/* Warna teks Operator Sekolah */
-.brand h1 { color: var(--dongker); }
-[data-theme="dark"] .brand h1 { color: #ffffff; }
-*{box-sizing:border-box;font-family:Inter,system-ui;}
-body{margin:0;background:var(--bg);color:var(--dongker);transition:background .3s,color .3s;}
-.app{max-width:1200px;margin:auto;padding:16px;}
-.header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
-.brand{display:flex;gap:10px;align-items:center;flex:1;}
-.logo{width:52px;height:52px;border-radius:12px;background:#fff;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;}
-.logo img{width:100%;height:100%;object-fit:contain;}
-h1{margin:0;font-size:20px;font-weight:700;}
-p.lead{margin:0;color:var(--muted);font-size:13px;}
-.layout{display:grid;grid-template-columns:240px 1fr;gap:16px;}
-@media(max-width:900px){.layout{grid-template-columns:1fr;}}
-.sidebar{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:var(--muted);cursor:pointer;transition:.2s;font-size:14px;}
-.nav-item:hover{background:var(--gray);color:var(--muted);}
-.nav-item.active{background:linear-gradient(90deg,rgba(11,94,215,0.1),rgba(43,110,163,0.05));color:var(--accent);font-weight:600;}
-.card{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);}
-footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px;}
-.switch{width:44px;height:24px;background:#d5fe04;border-radius:999px;position:relative;cursor:pointer;}
-.switch .knob{position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#000000;transition:all .2s;}
-.switch.on{background:linear-gradient(90deg,var(--accent),var(--accent-2));}
-.switch.on .knob{left:23px;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-table th,table td{padding:8px;border-bottom:1px solid var(--gray);}
-table th{background:#7ebeff;color:var(--dongker);}
-.center{text-align:center;}
-input,select{padding:6px;border-radius:6px;border:1px solid var(--gray);}
-button{padding:6px 12px;border-radius:6px;border:none;background:var(--dongker);color:#fff;cursor:pointer;transition:0.2s;}
-button:hover{background:var(--gray);color:#625e5e;}
-.dashboard-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-  align-items:start;
-}
-@media(max-width:800px){
-  .dashboard-grid{grid-template-columns:1fr;}
-}
-</style>
-</head>
-<body>
-<div class="app">
-  <div class="header">
-    <div class="brand">
-      <div class="logo"><img src="https://iili.io/FSNupqu.png" alt="Logo SDN 2 Tanjung Qencono"></div>
-      <div>
-        <h1>Absensi Siswa</h1>
-        <p class="lead">UPTD SD Negeri 2 Tanjung Qencono</p>
-      </div>
-    </div>
-    <div id="darkToggle" class="switch" title="Dark Mode"><div class="knob"></div></div>
-  </div>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UPTD SD Negeri 2 Tanjung Qencono</title>
+  <link rel="icon" href="https://iili.io/FSNupqu.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="nav-item active" data-page="dashboard">📊 Dashboard</div>
-      <div class="nav-item" data-page="absen">📝 Absensi</div>
-    </aside>
-
-    <main class="content">
-      <!-- DASHBOARD -->
-      <section id="page-dashboard" class="card">
-        <h2>📈 Rekap Kehadiran Siswa</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px;">
-          <label>Filter Tanggal:
-            <input type="date" id="filterDate">
-          </label>
-          <button id="refreshDashboard">🔄 Refresh</button>
-        </div>
-        <p id="waliKelasName">Wali Kelas: -</p>
-        <p id="kelasLabel">Kelas: -</p>
-
-        <div class="dashboard-grid">
-          <div class="card">
-            <canvas id="statsChart" height="250"></canvas>
-          </div>
-          <div class="card" style="overflow:auto;max-height:433px;">
-            <table>
-              <thead><tr><th>Nama</th><th>NISN</th><th>Status</th><th>Tanggal</th></tr></thead>
-              <tbody id="attendanceTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ABSENSI -->
-      <section id="page-absen" class="card" style="display:none">
-        <h2>📝 Absensi Siswa</h2>
-        <p id="waliKelasName2">Wali Kelas: -</p>
-        <table id="studentsTable">
-          <thead><tr><th>Nama</th><th>NISN</th><th>Status</th></tr></thead>
-          <tbody></tbody>
-        </table>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-          <button id="markAllPresent">✅ Hadir Semua</button>
-          <button id="submitAttendance">📤 Kirim Absensi</button>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <footer>© <span id="copyrightYear"></span> UPTD SD Negeri 2 Tanjung Qencono</footer>
-</div>
-
-<script>
-function getDateGMT7(d=new Date()){
-  const tzOffset=7*60;
-  const local=new Date(d.getTime()+(tzOffset+d.getTimezoneOffset())*60000);
-  const yyyy=local.getFullYear();
-  const mm=String(local.getMonth()+1).padStart(2,'0');
-  const dd=String(local.getDate()).padStart(2,'0');
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-const CURRENT_CLASS = "Kelas 6"; // Hanya untuk 1 kelas
-document.getElementById("kelasLabel").textContent = "Kelas: " + CURRENT_CLASS;
-
-const CLASS_API = {
-  "Kelas 6":"https://script.google.com/macros/s/AKfycbwP89RXgznibsHz4_rqVxQiNX3F8m2Z90U_AWvvy-TgUVU5EslhYQ3t8fRW_ijMJW4/exec"
-};
-
-const pages={dashboard:document.getElementById("page-dashboard"),absen:document.getElementById("page-absen")};
-document.querySelectorAll(".nav-item").forEach(n=>{
-  n.onclick=()=>{Object.keys(pages).forEach(p=>pages[p].style.display=(p===n.dataset.page?"block":"none"));
-  document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x===n));};
-});
-
-const darkToggle=document.getElementById("darkToggle");
-if(localStorage.getItem("theme")==="dark"){document.documentElement.setAttribute("data-theme","dark");darkToggle.classList.add("on");}
-darkToggle.onclick=()=>{
-  const dark=document.documentElement.getAttribute("data-theme")==="dark";
-  if(dark){document.documentElement.removeAttribute("data-theme");localStorage.setItem("theme","light");darkToggle.classList.remove("on");}
-  else{document.documentElement.setAttribute("data-theme","dark");localStorage.setItem("theme","dark");darkToggle.classList.add("on");}
-
-  // update warna teks pada grafik
-  if(statsChartInstance){
-    statsChartInstance.options.plugins.legend.labels.color = dark ? "#000000" : "#ffffff";
-    statsChartInstance.update();
-  }
-};
-
-document.getElementById("copyrightYear").textContent=new Date().getFullYear();
-
-async function apiGet(params){
-  const url=CLASS_API[CURRENT_CLASS]+"?"+new URLSearchParams(params);
-  const res=await fetch(url); const text=await res.text();
-  try{return JSON.parse(text);}catch{return[];}
-}
-async function apiPost(params,body){
-  const url=CLASS_API[CURRENT_CLASS]+"?"+new URLSearchParams(params);
-  const form=new URLSearchParams(); form.append("payload",JSON.stringify(body));
-  const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
-  return res.json();
-}
-
-async function loadWaliKelas(){
-  try{const wali=await apiGet({action:"getwali"});
-    document.getElementById("waliKelasName").textContent="Wali Kelas: "+(wali.nama||"-");
-    document.getElementById("waliKelasName2").textContent="Wali Kelas: "+(wali.nama||"-");
-  }catch{}
-}
-
-async function loadStudents(){
-  const body=document.querySelector("#studentsTable tbody");
-  body.innerHTML="<tr><td colspan=3 class=center>Memuat...</td></tr>";
-  try{
-    const data=await apiGet({action:"getstudents"});
-    body.innerHTML="";
-    data.forEach(s=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${s.Nama||""}</td><td>${s.NISN||""}</td><td><select><option>Hadir</option><option>Izin</option><option>Alpha</option></select></td>`;
-      body.appendChild(tr);
-    });
-  }catch(e){body.innerHTML=`<tr><td colspan=3 class=center>Gagal: ${e.message}</td></tr>`;}
-}
-
-async function loadAttendanceForDate(date){
-  const body=document.getElementById("attendanceTable");
-  body.innerHTML="<tr><td colspan=4 class=center>Memuat...</td></tr>";
-  try{
-    const data=await apiGet({action:"getattendance",since:date,to:date});
-    if(!data||data.length===0){body.innerHTML="<tr><td colspan=4 class=center>Tidak ada data</td></tr>";renderStatsChart({Hadir:0,Izin:0,Alpha:0});return;}
-    body.innerHTML="";
-    const stats={Hadir:0,Izin:0,Alpha:0};
-    data.forEach(r=>{
-      stats[r.Status]=(stats[r.Status]||0)+1;
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${r.Nama}</td><td>${r.NISN}</td><td>${r.Status}</td><td>${r.Tanggal}</td>`;
-      body.appendChild(tr);
-    });
-    renderStatsChart(stats);
-  }catch(e){body.innerHTML=`<tr><td colspan=4 class=center>Gagal: ${e.message}</td></tr>`;}
-}
-
-let statsChartInstance=null;
-function renderStatsChart(stats){
-  const ctx=document.getElementById("statsChart").getContext("2d");
-  if(statsChartInstance) statsChartInstance.destroy();
-  statsChartInstance=new Chart(ctx,{
-    type:"doughnut",
-    data:{labels:["Hadir","Izin","Alpha"],
-          datasets:[{data:[stats.Hadir||0,stats.Izin||0,stats.Alpha||0],
-                     backgroundColor:["#0b5ed7","#facc15","#ef4444"],
-                     borderWidth:0}]},
-    options:{plugins:{legend:{position:"bottom",labels:{color: document.documentElement.getAttribute("data-theme")==="dark" ? "#ffffff" : "#000000"}}},cutout:"70%",responsive:true}
-  });
-}
-
-document.getElementById("refreshDashboard").onclick=()=>loadAttendanceForDate(document.getElementById("filterDate").value||getDateGMT7());
-document.getElementById("filterDate").onchange=()=>loadAttendanceForDate(document.getElementById("filterDate").value||getDateGMT7());
-document.getElementById("markAllPresent").onclick=()=>document.querySelectorAll("#studentsTable tbody select").forEach(s=>s.value="Hadir");
-
-document.getElementById("submitAttendance").onclick = async () => {
-  const entries = [];
-  document.querySelectorAll("#studentsTable tbody tr").forEach(tr => {
-    entries.push({
-      Nama: tr.cells[0].textContent,
-      NISN: tr.cells[1].textContent,
-      Status: tr.cells[2].querySelector("select").value,
-      Tanggal: getDateGMT7()
-    });
-  });
-
-  try {
-    const res = await apiPost({ action: "submitattendance" }, { entries });
-
-    if (res.alreadySubmitted) {
-      alert("Sudah absen hari ini, coba lagi besok");
-    } else if (res.written && res.written > 0) {
-      alert("Absensi berhasil dikirim");
-      await loadAttendanceForDate(getDateGMT7());
-    } else {
-      alert("Sudah absen hari ini, coba lagi besok");
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #fff;
+      --muted: #0055ff;
+      --accent: #0b5ed7;
+      --accent-2: #2b6ea3;
+      --gray: #d5fe04;
+      --shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      --gold: #04ff71;
+      --dongker: #1e3a8a;
     }
 
-  } catch (e) {
-    alert("Sudah absen hari ini, coba lagi besok");
-  }
-};
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --card: #848484;
+      --muted: #006aff;
+      --accent: #d5fe04;
+      --accent-2: #d5fe04;
+      --gray: #d5fe04;
+    }
 
-document.getElementById("filterDate").value=getDateGMT7();
-loadWaliKelas();
-loadStudents();
-loadAttendanceForDate(getDateGMT7());
-</script>
+    /* Default warna teks Operator Sekolah */
+    .brand h1 {
+      color: var(--dongker);
+    }
+
+    /* Saat dark mode aktif */
+    [data-theme="dark"] .brand h1 {
+      color: #ffffff;
+    }
+
+    table th,
+    table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    table th {
+      background: #7ebeff;
+      color: var(--dongker);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: Inter, system-ui;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--dongker);
+      transition: background .3s, color .3s;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: auto;
+      padding: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    p.lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 16px;
+    }
+
+    @media(max-width:900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: .2s;
+      font-size: 14px;
+    }
+
+    .nav-item:hover {
+      background: var(--gray);
+      color: var(--muted);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(11, 94, 215, 0.1), rgba(43, 110, 163, 0.05));
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 24px;
+    }
+
+    .switch {
+      width: 44px;
+      height: 24px;
+      background: #d5fe04;
+      border-radius: 999px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .switch .knob {
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #000000;
+      transition: all .2s;
+    }
+
+    .switch.on {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .switch.on .knob {
+      left: 23px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table th,
+    table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--gray);
+    }
+
+    table th {
+      background: #7ebeff;
+      color: var(--dongker);
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    input,
+    select {
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--gray);
+    }
+
+    button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      background: var(--dongker);
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: var(--gray);
+      color: #000000;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    #studentsTable tbody tr:hover td,
+    #agendaTable tbody tr:hover td,
+    #kegiatanTable tbody tr:hover td {
+      background-color: #d5fe04;
+      transition: background-color 0.2s ease;
+    }
+
+    #studentsTable th,
+    #studentsTable td,
+    #agendaTable th,
+    #agendaTable td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    #studentsTable select {
+      text-align: center;
+      display: block;
+      margin: auto;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+    }
+
+    .icon-btn:hover {
+      background: #f0f0f0;
+    }
+
+    /* Popup PDF */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn .3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: var(--card);
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      color: var(--dongker);
+    }
+
+    [data-theme="dark"] .modal-content {
+      color: #000;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .modal-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .modal-row label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .modal-row select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--gray);
+      background: #fff;
+      color: #000;
+      min-width: 120px;
+      transition: all 0.2s ease;
+    }
+
+    .modal-row select:hover {
+      border-color: var(--dongker);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+    }
+
+    [data-theme="dark"] .modal-row select {
+      background: #444;
+      color: #fff;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 8px 0;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .modal-buttons button:first-child {
+      background: #ccc;
+      color: #333;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease
+    }
+
+    .modal-buttons button:first-child:hover {
+      background: #d5fe04;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-buttons button:last-child {
+      background: #0b5ed7;
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-buttons button:last-child:hover {
+      background: #d5fe04;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Agenda */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar .day,
+    .calendar .header {
+      padding: 8px;
+      text-align: center;
+      border-radius: 6px;
+    }
+
+    .calendar .header {
+      font-weight: 700;
+      background: var(--muted);
+      color: #fff;
+    }
+
+    .calendar .day {
+      background: var(--card);
+      cursor: pointer;
+      transition: 0.2s;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .calendar .day:hover {
+      background: var(--gray);
+      color: var(--dongker);
+    }
+
+    .calendar .today {
+      border: 2px solid var(--dongker);
+    }
+
+    @media(max-width:600px) {
+      .calendar .day {
+        min-height: 50px;
+        font-size: 12px;
+      }
+    }
+
+    .calendar .has-agenda {
+      background: #444;
+      color: #fff;
+    }
+
+    [data-theme="dark"] .calendar .has-agenda {
+      background: #ffffff;
+      color: #1e3a8a;
+    }
+
+    /* popup agenda */
+    #agendaCancel {
+      background: #0b5ed7;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #agendaSend {
+      background: #0b5ed7;
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    /* Hover animasi gradien / warna */
+    #agendaCancel:hover {
+      background: #d5fe04;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    #agendaSend:hover {
+      background: #d5fe04;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Focus input & textarea */
+    #agendaModal input:focus,
+    #agendaModal textarea:focus {
+      outline: none;
+      border-color: #0b5ed7;
+      box-shadow: 0 0 6px rgba(11, 94, 215, 0.4);
+    }
+
+    /* Responsive kecil */
+    @media(max-width:480px) {
+      .modal-content {
+        padding: 16px;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+
+      .modal-buttons button {
+        width: 100%;
+      }
+    }
+
+    @media(max-width:800px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media(max-width:480px) {
+      .modal-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .modal-row select {
+        width: 100%;
+      }
+
+      .modal-buttons {
+        flex-direction: column;
+      }
+
+      .modal-buttons button {
+        width: 100%;
+      }
+    }
+
+    /* === TABEL AGENDA === */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      margin-top: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .data-table thead {
+      background: #0a2e57;
+      color: #fff;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      vertical-align: top;
+    }
+
+    .data-table th.center,
+    .data-table td.center {
+      text-align: center;
+    }
+
+    .data-table tbody tr:hover {
+      background: #d5fe04;
+    }
+
+    /* === RESPONSIF UNTUK HP === */
+    @media (max-width: 700px) {
+      .data-table thead {
+        display: none;
+      }
+
+      .data-table,
+      .data-table tbody,
+      .data-table tr,
+      .data-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .data-table tr {
+        margin-bottom: 12px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+      }
+
+      .data-table td {
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .data-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: 600;
+        text-align: left;
+        color: #333;
+      }
+
+      .icon-btn {
+        font-size: 1rem;
+        padding: 6px 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand">
+        <div class="logo"><img src="https://iili.io/FSNupqu.png" alt="Logo SDN 2 Tanjung Qencono"></div>
+        <div>
+          <h1>Absensi Siswa</h1>
+          <p class="lead">UPTD SD Negeri 2 Tanjung Qencono</p>
+        </div>
+      </div>
+      <div id="darkToggle" class="switch" title="Dark Mode">
+        <div class="knob"></div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="nav-item active" data-page="dashboard">📊 Dashboard</div>
+        <div class="nav-item" data-page="absen">📝 Absensi</div>
+        <div class="nav-item" data-page="agenda">📅 Agenda</div>
+      </aside>
+
+      <main class="content">
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="card">
+          <h2>📈 Rekap Kehadiran Siswa</h2>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+            <label>Filter Tanggal:<input type="date" id="filterDate"></label>
+            <button id="refreshDashboard">🔄 Refresh</button>
+          </div>
+          <p id="waliKelasName">Wali Kelas: -</p>
+          <p id="kelasLabel">Kelas: -</p>
+          <div class="dashboard-grid">
+            <div class="card"><canvas id="statsChart" height="250"></canvas></div>
+            <div class="card" style="overflow:auto;max-height:433px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nama</th>
+                    <th>NISN</th>
+                    <th>Status</th>
+                    <th>Tanggal</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABSENSI -->
+        <section id="page-absen" class="card" style="display:none">
+          <h2>📝 Absensi Siswa</h2>
+          <p id="waliKelasName2">Wali Kelas: -</p>
+          <table id="studentsTable">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>NISN</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="markAllPresent">✅ Hadir Semua</button>
+            <button id="submitAttendance">📤 Kirim Absensi</button>
+          </div>
+        </section>
+
+        <!-- AGENDA -->
+        <section id="page-agenda" class="card" style="display:none">
+          <h2>📅 Agenda Kelas 2</h2>
+          <p id="waliKelasName3">Wali Kelas: -</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+            <div>
+              <select id="agendaMonth">
+                <option value="0">Januari</option>
+                <option value="1">Februari</option>
+                <option value="2">Maret</option>
+                <option value="3">April</option>
+                <option value="4">Mei</option>
+                <option value="5">Juni</option>
+                <option value="6">Juli</option>
+                <option value="7">Agustus</option>
+                <option value="8">September</option>
+                <option value="9">Oktober</option>
+                <option value="10">November</option>
+                <option value="11">Desember</option>
+              </select>
+              <select id="agendaYear"></select>
+            </div>
+          </div>
+          <div id="calendar" class="calendar"></div>
+          <div id="agendaNotes" style="margin-top:10px;font-size:13px;"></div>
+        </section>
+      </main>
+    </div>
+
+    <footer>© <span id="copyrightYear"></span> UPTD SD Negeri 2 Tanjung Qencono</footer>
+  </div>
+
+  <!-- Modal: tambah agenda -->
+  <div id="agendaModal" class="modal" aria-hidden="true">
+    <div class="modal-content"
+      style="max-width:480px; width:90%; border-radius:16px; padding:24px; background:linear-gradient(145deg,#ffffff,#e6f0ff); box-shadow:0 12px 25px rgba(0,0,0,0.25);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; font-size:20px; font-weight:700; color:#0b5ed7;">✏️ Tambah Agenda</h3>
+      </div>
+
+      <div class="modal-row" style="flex-direction:column; align-items:stretch; gap:12px;">
+        <label style="font-weight:600; color:#1e3a8a;">Tanggal</label>
+        <input id="agendaModalDate" readonly
+          style="padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; background:#f9f9f9;" />
+
+        <label style="font-weight:600; color:#1e3a8a;">Isi Agenda</label>
+        <textarea id="agendaModalText" rows="5" placeholder="Tulis agenda di sini..."
+          style="padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px; resize:none;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="agendaCancel">Batal</button>
+        <button id="agendaSend">Kirim</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ================= SCRIPT UTAMA ===================
+    function getDateGMT7(d = new Date()) { const tzOffset = 7 * 60; const local = new Date(d.getTime() + (tzOffset + d.getTimezoneOffset()) * 60000); return local.toISOString().split("T")[0]; }
+
+    const CURRENT_CLASS = "Kelas 6";
+    document.getElementById("kelasLabel").textContent = "Kelas: " + CURRENT_CLASS;
+
+    const CLASS_API = { "Kelas 6": "https://script.google.com/macros/s/AKfycbwkuXTxvbhguSLlfVnfJ-sYrhNl-gJvrCyt14YT1M9JkO8rEkeKEMISh-EIgBxkVppx/exec" };
+
+    const pages = {
+      dashboard: document.getElementById("page-dashboard"),
+      absen: document.getElementById("page-absen"),
+      agenda: document.getElementById("page-agenda")
+    };
+    document.querySelectorAll(".nav-item").forEach(n => {
+      n.onclick = () => {
+        for (const p in pages) pages[p].style.display = (p === n.dataset.page ? "block" : "none");
+        document.querySelectorAll(".nav-item").forEach(x => x.classList.toggle("active", x === n));
+      };
+    });
+
+    const darkToggle = document.getElementById("darkToggle");
+    if (localStorage.getItem("theme") === "dark") { document.documentElement.setAttribute("data-theme", "dark"); darkToggle.classList.add("on"); }
+    darkToggle.onclick = () => {
+      const dark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (dark) { document.documentElement.removeAttribute("data-theme"); localStorage.setItem("theme", "light"); darkToggle.classList.remove("on"); }
+      else { document.documentElement.setAttribute("data-theme", "dark"); localStorage.setItem("theme", "dark"); darkToggle.classList.add("on"); }
+    };
+    document.getElementById("copyrightYear").textContent = new Date().getFullYear();
+
+    async function apiGet(params) {
+      const url = CLASS_API[CURRENT_CLASS] + "?" + new URLSearchParams(params);
+      const res = await fetch(url); const text = await res.text();
+      try { return JSON.parse(text); } catch { return []; }
+    }
+    async function apiPost(params, body) {
+      const url = CLASS_API[CURRENT_CLASS] + "?" + new URLSearchParams(params);
+      const form = new URLSearchParams(); form.append("payload", JSON.stringify(body));
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form });
+      return res.json();
+    }
+
+    // ---------- Load Wali Kelas ----------
+    async function loadWaliKelas() {
+      // Kosongkan tampilan wali kelas dulu
+      const waliEls = [
+        document.getElementById("waliKelasName"),
+        document.getElementById("waliKelasName2"),
+        document.getElementById("waliKelasName3")
+      ];
+      waliEls.forEach(el => {
+        if (el) el.textContent = "Wali Kelas: ---";
+      });
+
+      try {
+        const wali = await apiGet({ action: "getwali", kelas: CURRENT_CLASS });
+        waliEls.forEach(el => {
+          if (el) el.textContent = "Wali Kelas: " + (wali.nama || "-");
+        });
+      } catch (e) {
+        console.error("Gagal memuat wali kelas:", e);
+        // tetap biarkan "---" jika error
+      }
+    }
+
+    loadWaliKelas();
+
+    async function loadStudents() {
+      const body = document.querySelector("#studentsTable tbody");
+      body.innerHTML = "<tr><td colspan=3 class=center>Memuat...</td></tr>";
+      try {
+        const data = await apiGet({ action: "getstudents" });
+        let html = "";
+        data.forEach(s => {
+          html += `<tr>
+        <td>${s.Nama || ""}</td>
+        <td>${s.NISN || ""}</td>
+        <td>
+          <select>
+            <option>Hadir</option>
+            <option>Izin</option>
+            <option>Alpha</option>
+          </select>
+        </td>
+      </tr>`;
+        });
+        body.innerHTML = html;
+      } catch (e) {
+        body.innerHTML = `<tr><td colspan=3 class=center>Gagal: ${e.message}</td></tr>`;
+      }
+    }
+
+    function showLoading(show = true) {
+      document.getElementById("loadingOverlay").style.display = show ? "flex" : "none";
+    }
+    async function initDashboard() {
+      const date = getDateGMT7();
+      document.getElementById("filterDate").value = date;
+
+      // Jalankan semua load secara paralel
+      await Promise.all([
+        loadWaliKelas(),
+        loadStudents(),
+        loadAttendanceForDate(date)
+      ]);
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      showLoading(true);
+      await initDashboard();
+      showLoading(false);
+    });
+
+
+    async function loadAttendanceForDate(date) {
+      const body = document.getElementById("attendanceTable");
+      body.innerHTML = "<tr><td colspan=4 class=center>Memuat...</td></tr>";
+      try {
+        const data = await apiGet({ action: "getattendance", since: date, to: date });
+        if (!data || data.length === 0) { body.innerHTML = "<tr><td colspan=4 class=center>Tidak ada data</td></tr>"; renderStatsChart({ Hadir: 0, Izin: 0, Alpha: 0 }); return; }
+        body.innerHTML = "";
+        const stats = { Hadir: 0, Izin: 0, Alpha: 0 };
+        data.forEach(r => {
+          stats[r.Status] = (stats[r.Status] || 0) + 1;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${r.Nama}</td><td>${r.NISN}</td><td>${r.Status}</td><td>${r.Tanggal}</td>`;
+          body.appendChild(tr);
+        });
+        renderStatsChart(stats);
+      } catch (e) { body.innerHTML = `<tr><td colspan=4 class=center>Gagal: ${e.message}</td></tr>`; }
+    }
+
+    let statsChartInstance = null;
+    function renderStatsChart(stats) {
+      const ctx = document.getElementById("statsChart").getContext("2d");
+      if (statsChartInstance) statsChartInstance.destroy();
+      statsChartInstance = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Hadir", "Izin", "Alpha"],
+          datasets: [{
+            data: [stats.Hadir || 0, stats.Izin || 0, stats.Alpha || 0],
+            backgroundColor: ["#0b5ed7", "#facc15", "#ef4444"],
+            borderWidth: 0
+          }]
+        },
+        options: { plugins: { legend: { position: "bottom", labels: { color: document.documentElement.getAttribute("data-theme") === "dark" ? "#ffffff" : "#000000" } } }, cutout: "70%", responsive: true }
+      });
+    }
+
+    document.getElementById("refreshDashboard").onclick = () => loadAttendanceForDate(document.getElementById("filterDate").value || getDateGMT7());
+    document.getElementById("filterDate").onchange = () => loadAttendanceForDate(document.getElementById("filterDate").value || getDateGMT7());
+    document.getElementById("markAllPresent").onclick = () => document.querySelectorAll("#studentsTable tbody select").forEach(s => s.value = "Hadir");
+
+    document.getElementById("submitAttendance").onclick = async () => {
+      const entries = [];
+      document.querySelectorAll("#studentsTable tbody tr").forEach(tr => {
+        entries.push({
+          Nama: tr.cells[0].textContent,
+          NISN: tr.cells[1].textContent,
+          Status: tr.cells[2].querySelector("select").value,
+          Tanggal: getDateGMT7()
+        });
+      });
+
+      try {
+        const res = await apiPost({ action: "submitattendance" }, { entries });
+
+        if (res.alreadySubmitted) {
+          alert("Sudah absen hari ini, coba lagi besok");
+        } else if (res.written && res.written > 0) {
+          alert("Absensi berhasil dikirim");
+          await loadAttendanceForDate(getDateGMT7());
+        } else {
+          alert("Sudah absen hari ini, coba lagi besok");
+        }
+
+      } catch (e) {
+        alert("Sudah absen hari ini, coba lagi besok");
+      }
+    };
+
+    // ====== AGENDA KELAS ======
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const monthSelect = document.getElementById("agendaMonth");
+    const yearSelect = document.getElementById("agendaYear");
+    const calendarDiv = document.getElementById("calendar");
+    const agendaNotesDiv = document.getElementById("agendaNotes");
+
+    let currMonth = new Date().getMonth();
+    let currYear = new Date().getFullYear();
+    let agendas = [];
+
+    // Modal
+    const agendaModal = document.getElementById("agendaModal");
+    const agendaDateInput = document.getElementById("agendaModalDate");
+    const agendaTextInput = document.getElementById("agendaModalText");
+    const agendaCancelBtn = document.getElementById("agendaCancel");
+    const agendaSendBtn = document.getElementById("agendaSend");
+
+    // ==========================================
+    // Inisialisasi dropdown bulan & tahun
+    function initMonthYearControls() {
+      monthSelect.innerHTML = monthNames.map((m, i) => `<option value="${i}">${m}</option>`).join("");
+      const now = new Date().getFullYear();
+      yearSelect.innerHTML = "";
+      for (let y = now - 5; y <= now + 5; y++) {
+        const opt = document.createElement("option");
+        opt.value = y; opt.textContent = y;
+        yearSelect.appendChild(opt);
+      }
+      monthSelect.value = currMonth;
+      yearSelect.value = currYear;
+    }
+
+    // ==========================================
+    // Fungsi API GET/POST
+    async function apiGet(params = {}, urlBase = null) {
+      const url = (urlBase || CLASS_API[CURRENT_CLASS]) + "?" + new URLSearchParams(params);
+      const res = await fetch(url);
+      return res.json();
+    }
+
+    async function apiPost(params = {}, data = {}, urlBase = null) {
+      const url = (urlBase || CLASS_API[CURRENT_CLASS]) + "?" + new URLSearchParams(params);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ payload: JSON.stringify(data) })
+      });
+      return res.json();
+    }
+
+    // Popup tambah/edit agenda
+    function openAgendaModal(dateStr, existing = null) {
+      const modalTitle = document.getElementById("agendaModalTitle");
+      if (modalTitle) {
+        modalTitle.textContent = existing ? "Edit Agenda" : "Tambah Agenda";
+      }
+
+      agendaDateInput.value = dateStr;
+      agendaTextInput.value = existing ? existing.Agenda || "" : "";
+      agendaModal.style.display = "flex";
+      agendaModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeAgendaModal() {
+      agendaModal.style.display = "none";
+      agendaModal.setAttribute("aria-hidden", "true");
+    }
+
+    // Tutup modal saat klik di luar
+    window.onclick = (e) => { if (e.target === agendaModal) closeAgendaModal(); };
+    agendaCancelBtn.addEventListener("click", (ev) => { ev.preventDefault(); closeAgendaModal(); });
+
+    // ==========================================
+    // Load agenda & render kalender + tabel
+    async function loadAgenda(dateStr) {
+      calendarDiv.innerHTML = "<div class='center'>Memuat...</div>";
+      const [year, month] = dateStr.split("-").map(Number);
+      currMonth = month - 1;
+      currYear = year;
+      monthSelect.value = currMonth;
+      yearSelect.value = currYear;
+
+      try {
+        let agendas = await apiGet({ action: "getagenda", year, month, kelas: CURRENT_CLASS });
+        if (!Array.isArray(agendas)) agendas = agendas.data || [];
+        renderCalendar(currMonth, currYear, agendas);
+        renderAgendaTable(currMonth, currYear, agendas);
+      } catch (e) {
+        calendarDiv.innerHTML = `<div class='center'>Gagal memuat agenda: ${e.message}</div>`;
+      }
+    }
+
+    // ==========================================
+    // Render kalender
+    function renderCalendar(month, year, agendas = []) {
+      calendarDiv.innerHTML = "";
+      const headers = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+      headers.forEach(h => {
+        const el = document.createElement("div");
+        el.className = "header";
+        el.textContent = h;
+        calendarDiv.appendChild(el);
+      });
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayStr = getDateGMT7();
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day";
+        calendarDiv.appendChild(empty);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const dayEl = document.createElement("div");
+        dayEl.className = "day";
+        if (dateStr === todayStr) dayEl.classList.add("today");
+
+        const hasAgenda = agendas.find(a => a.Tanggal === dateStr);
+        if (hasAgenda) {
+          dayEl.classList.add("has-agenda");
+          dayEl.title = hasAgenda.Agenda;
+        }
+
+        dayEl.innerHTML = `<strong>${d}</strong>`;
+        dayEl.onclick = () => openAgendaModal(dateStr, hasAgenda || null);
+        calendarDiv.appendChild(dayEl);
+      }
+    }
+
+    // Render tabel agenda dengan ikon edit/hapus (responsif)
+    function renderAgendaTable(month, year, agendas = []) {
+      const agendaNotesDiv = document.getElementById("agendaNotes");
+      if (!agendaNotesDiv) return;
+
+      if (agendas.length === 0) {
+        agendaNotesDiv.innerHTML = `
+      <div class="note center">Belum ada agenda bulan ini</div>
+    `;
+        return;
+      }
+
+      // Buat tabel HTML
+      let tableHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="center">Tanggal</th>
+          <th>Agenda</th>
+          <th class="center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+      // Isi tabel
+      agendas.forEach(a => {
+        const tanggal = a.Tanggal || "-";
+        const agenda = a.Agenda || "";
+        tableHTML += `
+      <tr data-date="${tanggal}">
+        <td class="center" data-label="Tanggal">${tanggal}</td>
+        <td data-label="Agenda">${agenda}</td>
+        <td class="center" data-label="Aksi">
+          <button class="icon-btn" title="Edit" data-action="edit" data-date="${tanggal}">✏️</button>
+          <button class="icon-btn" title="Hapus" data-action="delete" data-date="${tanggal}">🗑️</button>
+        </td>
+      </tr>
+    `;
+      });
+
+      tableHTML += "</tbody></table>";
+      agendaNotesDiv.innerHTML = tableHTML;
+      function showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        // ================== NOTIFIKASI DELETE ==================
+        Object.assign(toast.style, {
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          minWidth: "200px",
+          maxWidth: "90%",
+          padding: "12px 18px",
+          background: type === "success" ? "#0a2e57" :
+            type === "error" ? "#e53935" : "#fbc02d",
+          color: type === "info" ? "#000" : "#fff",
+          fontWeight: "600",
+          textAlign: "center",
+          borderRadius: "8px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          zIndex: "9999",
+          opacity: "0",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
+        });
+
+        // Animasi muncul
+        requestAnimationFrame(() => {
+          toast.style.opacity = "1";
+          toast.style.transform = "translate(-50%, -50%) scale(1)";
+        });
+
+        // Hilangkan toast otomatis setelah 2,5 detik
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translate(-50%, -50%) scale(0.95)";
+          setTimeout(() => toast.remove(), 300);
+        }, 2500);
+      }
+
+      // === EVENT HANDLER TOMBOL ===
+      agendaNotesDiv.querySelectorAll(".icon-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          const date = e.target.dataset.date;
+          const action = e.target.dataset.action;
+
+          // Tombol EDIT
+          if (action === "edit") {
+            const item = agendas.find(x => x.Tanggal === date);
+            if (item) openAgendaModal(date, item);
+          }
+
+          // Tombol HAPUS
+          else if (action === "delete") {
+            const confirmed = await customConfirm(`Yakin ingin menghapus agenda tanggal ${date}?`);
+            if (!confirmed) return;
+
+            try {
+              const res = await apiPost(
+                { action: "deleteagenda" },
+                { Tanggal: date },
+                CLASS_API[CURRENT_CLASS]
+              );
+
+              if (res && res.success) {
+                // gunakan showToast yang sama dengan notif "terkirim"
+                showToast(`Agenda tanggal ${date} berhasil dihapus!`, "success");
+                await loadAgenda(`${year}-${String(month + 1).padStart(2, '0')}-01`);
+              } else {
+                showToast("❌ Gagal menghapus agenda.", "error");
+              }
+            } catch (err) {
+              console.error(err);
+              showToast("⚠️ Terjadi kesalahan saat menghapus agenda.", "error");
+            }
+          }
+        });
+      });
+    }
+
+    // === NOTIFIKASI RINGAN (Toast) ===
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      Object.assign(toast.style, {
+        position: "fixed",
+        bottom: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: "#0a2e57",
+        color: "#fff",
+        padding: "10px 18px",
+        borderRadius: "10px",
+        fontSize: "14px",
+        zIndex: "9999",
+        opacity: "0",
+        transition: "opacity 0.4s ease, bottom 0.4s ease",
+      });
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = "1";
+        toast.style.bottom = "40px";
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.bottom = "20px";
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    // === KONFIRMASI TANPA ALERT WEBSITE ===
+    function customConfirm(message) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement("div");
+        overlay.className = "confirm-overlay";
+        overlay.innerHTML = `
+      <div class="confirm-box">
+        <p>${message}</p>
+        <div class="confirm-btns">
+          <button id="confirm-yes">Ya</button>
+          <button id="confirm-no">Batal</button>
+        </div>
+      </div>
+    `;
+
+        Object.assign(overlay.style, {
+          position: "fixed",
+          top: "0", left: "0",
+          width: "100%", height: "100%",
+          background: "rgba(0,0,0,0.4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: "9998",
+        });
+
+        const box = overlay.querySelector(".confirm-box");
+        Object.assign(box.style, {
+          background: "#fff",
+          borderRadius: "12px",
+          padding: "20px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+          textAlign: "center",
+          width: "300px",
+          maxWidth: "90%",
+          fontFamily: "Inter, sans-serif",
+        });
+
+        const btns = box.querySelector(".confirm-btns");
+        Object.assign(btns.style, {
+          marginTop: "14px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px"
+        });
+
+        const yesBtn = box.querySelector("#confirm-yes");
+        const noBtn = box.querySelector("#confirm-no");
+
+        yesBtn.style.cssText = `
+      background: #0b5ed7;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    `;
+        noBtn.style.cssText = `
+      background: #ccc;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    `;
+
+        // Hover effect
+        yesBtn.addEventListener("mouseenter", () => yesBtn.style.background = "#d5fe04");
+        yesBtn.addEventListener("mouseleave", () => yesBtn.style.background = "#0b5ed7");
+
+        noBtn.addEventListener("mouseenter", () => noBtn.style.background = "#d5fe04");
+        noBtn.addEventListener("mouseleave", () => noBtn.style.background = "#ccc");
+
+        yesBtn.onclick = () => { overlay.remove(); resolve(true); };
+        noBtn.onclick = () => { overlay.remove(); resolve(false); };
+
+        document.body.appendChild(overlay);
+      });
+    }
+    // Tombol Kirim agenda
+    agendaSendBtn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      const tanggal = agendaDateInput.value;
+      const isi = agendaTextInput.value.trim();
+      if (!isi) return alert("Isi agenda tidak boleh kosong!");
+
+      agendaSendBtn.disabled = true;
+      const oldText = agendaSendBtn.textContent;
+      agendaSendBtn.textContent = "Mengirim...";
+
+      try {
+        const res = await apiPost({ action: "submitagenda" }, { Tanggal: tanggal, Agenda: isi });
+        if (res && res.success) {
+          await loadAgenda(`${currYear}-${String(currMonth + 1).padStart(2, '0')}-01`);
+          closeAgendaModal();
+          alert(`Agenda berhasil dikirim ke ${CURRENT_CLASS}`);
+        } else {
+          alert("Gagal mengirim agenda: " + (res.message || "Server tidak merespon"));
+        }
+      } catch (e) {
+        alert("Terjadi kesalahan: " + e.message);
+      } finally {
+        agendaSendBtn.disabled = false;
+        agendaSendBtn.textContent = oldText;
+      }
+    });
+
+    // Inisialisasi awal
+    initMonthYearControls();
+    loadAgenda(getDateGMT7());
+
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      const today = getDateGMT7();
+      const filterInput = document.getElementById("filterDate");
+
+      // Set value input tanggal ke hari ini
+      filterInput.value = today;
+
+      await loadWaliKelas();
+      await loadStudents();
+
+      // Load data absensi sesuai tanggal hari ini
+      await loadAttendanceForDate(today);
+    });
+
+
+  </script>
 </body>
+
 </html>
